@@ -24,13 +24,39 @@ export type Program = {
 export type EventItem = {
   slug: string;
   title: string;
+  /** Human-readable date, e.g. "April 13, 2026". Keep in sync with dateISO. */
   date: string;
+  /** Machine-readable date (YYYY-MM-DD) used to sort events and tell upcoming from past. */
+  dateISO: string;
   time: string;
   location: string;
   excerpt: string;
   details: string;
   audience: string;
 };
+
+/** End-of-day Date for an event, in local time. */
+export function eventEndDate(event: EventItem): Date {
+  return new Date(`${event.dateISO}T23:59:59`);
+}
+
+export function isPastEvent(event: EventItem, now = new Date()): boolean {
+  return eventEndDate(event) < now;
+}
+
+/** Events that have not happened yet, soonest first. */
+export function upcomingEvents(now = new Date()): EventItem[] {
+  return events
+    .filter((event) => !isPastEvent(event, now))
+    .sort((a, b) => a.dateISO.localeCompare(b.dateISO));
+}
+
+/** Events that have already happened, most recent first. */
+export function pastEvents(now = new Date()): EventItem[] {
+  return events
+    .filter((event) => isPastEvent(event, now))
+    .sort((a, b) => b.dateISO.localeCompare(a.dateISO));
+}
 
 export type Book = {
   title: string;
@@ -44,7 +70,6 @@ export const site = {
   name: "Early Birders Birding Club",
   shortName: "EBBC",
   email: "hello@earlybirders.org",
-  phone: "(910) 555-0142",
   address: "Wilmington, North Carolina",
   mission:
     "We help young people discover birds, conservation, and confidence outdoors through access to optics, community bird feeders, and guided local programs.",
@@ -62,8 +87,8 @@ export const navItems: NavItem[] = [
 export const missionImages: MissionImage[] = [
   {
     src: "/feeders.jpg",
-    alt: "A close up of binoculars on a wooden table",
-    caption: "Providing essential gear to budding conservationists.",
+    alt: "Wooden birdhouses and a hanging feeder mounted on trees in a forest",
+    caption: "Creating habitat connectivity through public feeder projects.",
   },
   {
     src: "/binoculars.jpg",
@@ -72,8 +97,8 @@ export const missionImages: MissionImage[] = [
   },
   {
     src: "/gulls.jpg",
-    alt: "A bird feeder hanging from a tree branch with a small bird",
-    caption: "Creating habitat connectivity through public feeder projects.",
+    alt: "A flock of terns in flight over the water",
+    caption: "Coastal birds are often easiest to learn in the places they gather.",
   },
 ];
 
@@ -146,6 +171,7 @@ export const events: EventItem[] = [
     slug: "sunrise-shorebirds-wrightsville",
     title: "Sunrise Shorebirds Walk",
     date: "April 13, 2026",
+    dateISO: "2026-04-13",
     time: "7:00 AM - 9:00 AM",
     location: "Wrightsville Beach Loop",
     excerpt:
@@ -158,6 +184,7 @@ export const events: EventItem[] = [
     slug: "raptors-and-river-trails",
     title: "Raptors and River Trails",
     date: "April 27, 2026",
+    dateISO: "2026-04-27",
     time: "8:30 AM - 11:00 AM",
     location: "Carolina Beach State Park",
     excerpt:
@@ -170,6 +197,7 @@ export const events: EventItem[] = [
     slug: "feeders-for-neighborhood-parks",
     title: "Feeders for Neighborhood Parks",
     date: "May 4, 2026",
+    dateISO: "2026-05-04",
     time: "10:00 AM - 12:30 PM",
     location: "Greenfield Lake Area, Wilmington",
     excerpt:
@@ -181,20 +209,6 @@ export const events: EventItem[] = [
 ];
 
 export const books: Book[] = [
-  // {
-  //   title: "The Gull Guide: North America",
-  //   author: "Amar Ayyash",
-  //   category: "Identification",
-  //   description: "The definitive guide to identifying gulls across the continent with detailed photos and range maps.",
-  //   imageUrl: "https://covers.openlibrary.org/b/isbn/9780691195896-L.jpg",
-  // },
-  // {
-  //   title: "The Shorebirds of North America: A Natural History and Photographic Celebration",
-  //   author: "Kevin Karlson & Brian Small",
-  //   category: "Identification",
-  //   description: "A visually stunning exploration of North American shorebirds, blending science with world-class photography.",
-  //   imageUrl: "https://covers.openlibrary.org/b/isbn/9780691224701-L.jpg",
-  // },
   {
     title: "The Birds That Audubon Missed",
     author: "Kenn Kaufman",
@@ -230,13 +244,6 @@ export const books: Book[] = [
     description: "Renowned author Amy Tan shares her personal journey of discovering the joy of birding in her own backyard.",
     imageUrl: "https://covers.openlibrary.org/b/isbn/9780593536131-L.jpg",
   },
-  // {
-  //   title: "Bird City",
-  //   author: "Ryan Goldberg",
-  //   category: "Science & Nature",
-  //   description: "Exploring the diverse avian life that thrives in urban environments around the world.",
-  //   imageUrl: "https://covers.openlibrary.org/b/isbn/9781643755564-L.jpg",
-  // },
   {
     title: "Sibley Birds East",
     author: "David Allen Sibley",

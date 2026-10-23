@@ -123,47 +123,52 @@ export async function getRecentBirdSightings(params: {
     }
 
     const observations = (await response.json()) as EBirdObservation[];
-    console.log(`Fetched ${observations.length} observations from eBird.`);
 
+    const NO_IMAGE: BirdImage = {
+      imageUrl: null,
+      imagePageUrl: null,
+      imageAttribution: "",
+    };
     const imageBySpecies = new Map<string, BirdImage>();
-    let imagesFoundCount = 0;
 
-    // Fetch images sequentially until we hit maxImageResults
+    // One representative observation per species, in eBird's order.
+    const uniqueBySpecies = new Map<string, EBirdObservation>();
     for (const observation of observations) {
-      // If we've already seen this species, skip
-      if (imageBySpecies.has(observation.speciesCode)) {
-        continue;
+      if (!uniqueBySpecies.has(observation.speciesCode)) {
+        uniqueBySpecies.set(observation.speciesCode, observation);
       }
+    }
+    const uniqueObservations = [...uniqueBySpecies.values()];
 
-      // If we have enough images, stop requesting new ones from Wikipedia
-      if (maxImageResults !== undefined && imagesFoundCount >= maxImageResults) {
-        imageBySpecies.set(observation.speciesCode, {
-          imageUrl: null,
-          imagePageUrl: null,
-          imageAttribution: "",
-        });
-        continue;
-      }
-
-      const image = await getBirdImage(observation);
-      imageBySpecies.set(observation.speciesCode, image);
-
-      if (image.imageUrl) {
-        console.log(`Found image for ${observation.comName}: ${image.imageUrl}`);
-        imagesFoundCount++;
+    if (maxImageResults === undefined) {
+      // No cap: look up every species' image in parallel instead of
+      // one sequential Wikipedia round-trip per species.
+      const images = await Promise.all(
+        uniqueObservations.map((observation) => getBirdImage(observation)),
+      );
+      uniqueObservations.forEach((observation, index) => {
+        imageBySpecies.set(observation.speciesCode, images[index]);
+      });
+    } else {
+      // Capped: fetch sequentially and stop once enough images are found,
+      // so the homepage does not pay for lookups it will never show.
+      let imagesFoundCount = 0;
+      for (const observation of uniqueObservations) {
+        if (imagesFoundCount >= maxImageResults) {
+          imageBySpecies.set(observation.speciesCode, NO_IMAGE);
+          continue;
+        }
+        const image = await getBirdImage(observation);
+        imageBySpecies.set(observation.speciesCode, image);
+        if (image.imageUrl) imagesFoundCount++;
       }
     }
 
     const result = observations.map((observation) => ({
       ...observation,
-      image: imageBySpecies.get(observation.speciesCode) ?? {
-        imageUrl: null,
-        imagePageUrl: null,
-        imageAttribution: "",
-      },
+      image: imageBySpecies.get(observation.speciesCode) ?? NO_IMAGE,
     }));
 
-    console.log(`Returning ${result.filter(o => o.image.imageUrl).length} observations with images.`);
     return result;
   } catch (error) {
     console.error("Failed to fetch recent bird observations:", error);

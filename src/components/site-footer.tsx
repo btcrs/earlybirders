@@ -12,8 +12,11 @@ export function SiteFooter() {
         <div>
           <p className="font-semibold text-slate-900">Get In Touch</p>
           <p className="mt-2 text-slate-600">{site.address}</p>
-          <p className="text-slate-600">{site.phone}</p>
-          <p className="text-slate-600">{site.email}</p>
+          <p className="text-slate-600">
+            <a href={`mailto:${site.email}`} className="hover:text-emerald-800">
+              {site.email}
+            </a>
+          </p>
         </div>
         <div>
           <p className="font-semibold text-slate-900">Quick Links</p>
