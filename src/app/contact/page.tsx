@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ContactForm } from "@/components/contact-form";
 import { site } from "@/lib/data";
 
 export const metadata: Metadata = {
@@ -17,31 +18,16 @@ export default function ContactPage() {
         </p>
         <div className="mt-6 space-y-2 text-slate-700">
           <p>{site.address}</p>
-          <p>{site.phone}</p>
-          <p>{site.email}</p>
+          <p>
+            <a href={`mailto:${site.email}`} className="text-emerald-800 underline">
+              {site.email}
+            </a>
+          </p>
         </div>
       </section>
       <section className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
         <h2 className="text-xl font-semibold text-slate-900">Send a Message</h2>
-        <form className="mt-4 space-y-3">
-          <input className="w-full rounded-md border border-slate-300 px-3 py-2" placeholder="Name" />
-          <input
-            className="w-full rounded-md border border-slate-300 px-3 py-2"
-            placeholder="Email"
-            type="email"
-          />
-          <textarea
-            className="w-full rounded-md border border-slate-300 px-3 py-2"
-            placeholder="How can we help?"
-            rows={5}
-          />
-          <button
-            type="button"
-            className="rounded-md bg-emerald-800 px-5 py-3 font-semibold text-white hover:bg-emerald-900"
-          >
-            Send Message
-          </button>
-        </form>
+        <ContactForm />
       </section>
     </div>
   );
