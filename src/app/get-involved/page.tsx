@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SectionHeading } from "@/components/section-heading";
+import { VolunteerForm } from "@/components/volunteer-form";
 
 export const metadata: Metadata = {
   title: "Get Involved",
@@ -37,29 +38,8 @@ export default function GetInvolvedPage() {
           </article>
         ))}
       </div>
-      <form className="mt-10 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-        <h2 className="text-2xl font-semibold text-slate-900">Volunteer Interest Form</h2>
-        <div className="mt-5 grid gap-4 md:grid-cols-2">
-          <input className="rounded-md border border-slate-300 px-3 py-2" placeholder="Name" />
-          <input className="rounded-md border border-slate-300 px-3 py-2" placeholder="Email" />
-          <input className="rounded-md border border-slate-300 px-3 py-2" placeholder="Phone" />
-          <input
-            className="rounded-md border border-slate-300 px-3 py-2"
-            placeholder="Organization (optional)"
-          />
-        </div>
-        <textarea
-          className="mt-4 w-full rounded-md border border-slate-300 px-3 py-2"
-          placeholder="How would you like to get involved?"
-          rows={4}
-        />
-        <button
-          type="button"
-          className="mt-4 rounded-md bg-emerald-800 px-5 py-3 font-semibold text-white hover:bg-emerald-900"
-        >
-          Submit Interest
-        </button>
-      </form>
+      <VolunteerForm />
+
     </div>
   );
 }

@@ -22,6 +22,16 @@ export const metadata: Metadata = {
   description:
     "A Wilmington-area nonprofit helping kids discover birding, conservation, and outdoor learning through donated optics, guided walks, and community habitat programs.",
   metadataBase: new URL("https://earlybirders.org"),
+  openGraph: {
+    title: "Early Birders Birding Club | Youth Birding in Wilmington NC",
+    description:
+      "A Wilmington-area nonprofit helping kids discover birding, conservation, and outdoor learning through donated optics, guided walks, and community habitat programs.",
+    url: "https://earlybirders.org",
+    siteName: "Early Birders Birding Club",
+    images: [{ url: "/hero-banner.jpeg", alt: "An American Oystercatcher on the beach" }],
+    locale: "en_US",
+    type: "website",
+  },
 };
 
 export default function RootLayout({

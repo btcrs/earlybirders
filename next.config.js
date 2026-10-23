@@ -2,22 +2,9 @@
 const nextConfig = {
   poweredByHeader: false,
   images: {
+    // Only the hosts images actually come from: Wikipedia photos for
+    // recent sightings, and Open Library covers for the library page.
     remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "i.pinimg.com",
-        pathname: "/**",
-      },
-      {
-        protocol: "https",
-        hostname: "cdn.download.ams.birds.cornell.edu",
-        pathname: "/api/v2/asset/**",
-      },
-      {
-        protocol: "https",
-        hostname: "images.unsplash.com",
-        pathname: "/**",
-      },
       {
         protocol: "https",
         hostname: "upload.wikimedia.org",

@@ -6,9 +6,14 @@ import { RecentSightingsGrid } from "@/components/recent-sightings";
 import { NewsletterSignup } from "@/components/newsletter-signup";
 import { ProgramCard } from "@/components/program-card";
 import { SectionHeading } from "@/components/section-heading";
-import { events, programs, testimonials } from "@/lib/data";
+import { programs, testimonials, upcomingEvents } from "@/lib/data";
+
+// Refresh at least every 15 minutes (driven by the recent-sightings fetch)
+// so the upcoming-events list stays honest between deploys.
+export const revalidate = 900;
 
 export default function Home() {
+  const upcoming = upcomingEvents();
   return (
     <div>
       {/* Mobile-only Split Hero */}
@@ -125,11 +130,22 @@ export default function Home() {
           eyebrow="Upcoming Events"
           title="Join us in Wilmington, Wrightsville Beach, and Carolina Beach"
         />
-        <div className="mt-8 flex flex-col gap-3">
-          {events.map((event) => (
-            <EventCard key={event.slug} event={event} />
-          ))}
-        </div>
+        {upcoming.length > 0 ? (
+          <div className="mt-8 flex flex-col gap-3">
+            {upcoming.map((event) => (
+              <EventCard key={event.slug} event={event} />
+            ))}
+          </div>
+        ) : (
+          <p className="mt-8 rounded-2xl border border-slate-200 bg-white p-8 text-slate-700 shadow-sm">
+            No walks are scheduled right now. New dates are added as walks are
+            confirmed. See{" "}
+            <Link href="/events" className="font-medium text-emerald-800 underline">
+              past events
+            </Link>{" "}
+            for what our walks are like.
+          </p>
+        )}
       </section>
 
       <section className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8 sm:py-20">

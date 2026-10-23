@@ -1,11 +1,17 @@
 import Link from "next/link";
-import type { EventItem } from "@/lib/data";
+import { isPastEvent, type EventItem } from "@/lib/data";
+
+const MONTHS = [
+  "JAN", "FEB", "MAR", "APR", "MAY", "JUN",
+  "JUL", "AUG", "SEP", "OCT", "NOV", "DEC",
+];
 
 export function EventCard({ event }: { event: EventItem }) {
-  // Helper to parse "April 13, 2026" into parts
-  const dateParts = event.date.split(" ");
-  const month = dateParts[0].substring(0, 3).toUpperCase();
-  const day = dateParts[1].replace(",", "");
+  // Parse the ISO date directly instead of splitting the display string.
+  const [, monthPart, dayPart] = event.dateISO.split("-");
+  const month = MONTHS[Number.parseInt(monthPart, 10) - 1] ?? "";
+  const day = String(Number.parseInt(dayPart, 10));
+  const past = isPastEvent(event);
 
   return (
     <article className="group relative bg-white border border-slate-100 rounded-2xl transition-all hover:border-emerald-200 hover:bg-slate-50/30 hover:shadow-sm mt-2">
@@ -26,8 +32,14 @@ export function EventCard({ event }: { event: EventItem }) {
             <span>{event.time}</span>
             <span className="h-1 w-1 rounded-full bg-slate-300" />
             <span>{event.location}</span>
+            {past ? (
+              <>
+                <span className="h-1 w-1 rounded-full bg-slate-300" />
+                <span className="text-slate-500">Past event</span>
+              </>
+            ) : null}
           </div>
-          
+
           <h3 className="mt-2 text-2xl font-extrabold text-slate-900 group-hover:text-emerald-700 transition-colors">
             <Link href={`/events/${event.slug}`}>
               {event.title}
@@ -45,7 +57,7 @@ export function EventCard({ event }: { event: EventItem }) {
             href={`/events/${event.slug}`}
             className="inline-flex h-12 items-center justify-center rounded-full bg-slate-900 px-8 text-sm font-bold text-white transition-all hover:bg-emerald-600 hover:shadow-lg hover:shadow-emerald-200"
           >
-            Join
+            {past ? "Details" : "Join"}
           </Link>
         </div>
       </div>
